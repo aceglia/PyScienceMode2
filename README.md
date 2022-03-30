@@ -21,7 +21,7 @@ make install -jx
 ```
 with x the number of CPU. 
 
-##Check the installation 
+## Check the installation 
 In a linux console : 
 ```
 python
