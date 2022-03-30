@@ -1,0 +1,2 @@
+/home/amedeo/miniconda3/envs/casadi/lib/python3.9/site-packages/PyScienceMode2/__init__.py
+/home/amedeo/miniconda3/envs/casadi/lib/python3.9/site-packages/PyScienceMode2/_PyScienceMode2.so

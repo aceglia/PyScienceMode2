@@ -1,0 +1,22 @@
+// File : ScienceMode2.i
+%module PyScienceMode2
+
+%{
+#define SWIG_FILE_WITH_INIT
+#include "Python.h"
+#include <iostream>
+#include "serial_linux.h"
+#include "serialport.h"
+#include "ScienceMode2.h"
+%}
+
+
+%include "std_shared_ptr.i";
+%shared_ptr(std::vector<unsigned char>);
+%include <typemaps.i>
+%include <std_string.i>
+%include <std_vector.i>
+
+%include "@CMAKE_SOURCE_DIR@/serial_linux.h"
+%include "@CMAKE_SOURCE_DIR@/serialport.h"
+%include "@CMAKE_SOURCE_DIR@/ScienceMode2.h"

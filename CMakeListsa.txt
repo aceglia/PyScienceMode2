@@ -1,0 +1,97 @@
+cmake_minimum_required(VERSION 3.14)
+project(ScienceMode2 VERSION 0.0.1)
+set (CMAKE_CXX_STANDARD 11)
+set (SCM2_NAME ${PROJECT_NAME})
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
+    project(_${SCM2_NAME})
+else()
+    project(${SCM2_NAME})
+endif()
+
+# Include python
+# The next two lines should be preferred to find PythonInterp, but works less...
+# set(Python3_FIND_VIRTUALENV FIRST)
+# set(Python3_FIND_STRATEGY LOCATION)
+# Force the use of current Python (especially when using conda env)
+find_package(PythonInterp REQUIRED)
+set(Python3_EXECUTABLE ${PYTHON_EXECUTABLE})
+find_package(Python3 REQUIRED
+    COMPONENTS Interpreter Development NumPy
+)
+
+include_directories("${Python3_INCLUDE_DIRS}")
+
+include_directories("${Python3_NumPy_INCLUDE_DIRS}")
+
+set(SCM2LIB_INCLUDE_DIR "")
+set(${SCM2LIB_INCLUDE_DIR} "/home/amedeo/Documents/programmation/PyScienceMode2/lib")
+
+# Create the .i file
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${SCM2_NAME}_linux.i.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${SCM2_NAME}_linux.i" @ONLY)
+
+# Add swig module
+find_package (SWIG)
+include (UseSWIG)
+
+set(CMAKE_SWIG_FLAGS "")
+set(I_SOURCE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${SCM2_NAME}_linux.i")
+
+set_property(SOURCE "${I_SOURCE_FILE}"
+   PROPERTY CPLUSPLUS ON
+)
+
+SWIG_ADD_LIBRARY(${PROJECT_NAME}
+    TYPE SHARED
+    LANGUAGE "python"
+    SOURCES "${I_SOURCE_FILE}"
+)
+# Linkings to the library
+swig_link_libraries(${PROJECT_NAME}
+    "/home/amedeo/Documents/programmation/PyScienceMode2/lib/libScienceMode2.so"
+)
+
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
+    set(PYTHON_PROJECT_NAME ${PROJECT_NAME})
+else()
+    set(PYTHON_PROJECT_NAME _${PROJECT_NAME})
+endif()
+
+# Add headers
+target_include_directories(${PYTHON_PROJECT_NAME} PRIVATE
+    "${CMAKE_SOURCE_DIR}/include"
+    "${SCM2_BINARY_DIR}"
+    "${Python3_INCLUDE_DIRS}"
+    "${Python3_NumPy_INCLUDE_DIRS}"
+)
+
+
+set_target_properties(${PYTHON_PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    INSTALL_RPATH "${${SCM2_NAME}_BIN_FOLDER}"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+	
+# Install to the proper directories
+INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/${SCM2_NAME}.py"
+    DESTINATION "${Python3_SITELIB}/${SCM2_NAME}"
+)
+
+file(GLOB PYTHON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
+INSTALL(FILES ${PYTHON_FILES}
+    DESTINATION "${Python3_SITELIB}/${SCM2_NAME}"
+)
+
+# Check if swig has its version 3 or 4, to choose the right place to put the library
+if(${SWIG_VERSION} MATCHES "^3(\.[0-9]*)*$")
+    set(PYTHON_INSTALL_DESTINATION "${Python3_SITELIB}")
+elseif(${SWIG_VERSION} MATCHES "^4(\.[0-9]*)*$")
+    set(PYTHON_INSTALL_DESTINATION "${Python3_SITELIB}/${SCM2_NAME}")
+else()
+    message( FATAL_ERROR "Swig must be version 3 or 4" )
+endif()
+
+# Install the library
+INSTALL(TARGETS ${PYTHON_PROJECT_NAME}
+    DESTINATION "${PYTHON_INSTALL_DESTINATION}"
+)
