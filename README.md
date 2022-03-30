@@ -9,34 +9,34 @@ run ./generate.sh in a linux console
 ## Compile the swig package
 create build folder
 Into the build folder execute the following command :
-'''
+```
 ccmake . ..
-'''
+```
 Add the installation path for the package. 
 
 run the command : 
 
-'''
+```
 make install -jx
-'''
+```
 with x the number of CPU. 
 
 ##Check the installation 
 In a linux console : 
-'''
+```
 python
-'''
+```
 
-'''
-import PyScienceMode2 as scm2
-'''
+```
+>>>import PyScienceMode2 as scm2
+```
 If no error message the package is rightly installed. 
 
 If the rehastim is connected : 
 
-'''
-device = scm2.ScienceMode2()
-device.Open_serial()
-device.Close_serial()
-'''
+```
+>>>device = scm2.ScienceMode2()
+>>>device.Open_serial()
+>>>device.Close_serial()
+```
 
